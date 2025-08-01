@@ -35,6 +35,17 @@ return {
 			-- Create a function that lets us more easily define mappings specific LSP related items.
 			-- It sets the mode, buffer and description for us each time.
 			callback = function(event)
+				vim.api.nvim_create_autocmd("FileType", {
+					pattern = "terraform",
+					callback = function()
+						vim.diagnostic.config({
+							severity = { min = vim.diagnostic.severity.ERROR },
+							virtual_text = { severity = { min = vim.diagnostic.severity.ERROR } },
+							signs = { severity = { min = vim.diagnostic.severity.ERROR } },
+						})
+					end,
+				})
+
 				local map = function(keys, func, desc)
 					vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
 				end
@@ -198,6 +209,8 @@ return {
 			terraformls = {},
 			yamlls = {},
 			bashls = {},
+			gopls = {},
+			delve = {},
 			dockerls = {},
 			docker_compose_language_service = {},
 			-- tailwindcss = {},

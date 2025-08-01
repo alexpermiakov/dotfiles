@@ -25,6 +25,7 @@ return {
 			"markdown_inline",
 			"bash",
 			"tsx",
+			"terraform",
 			"css",
 			"html",
 		},

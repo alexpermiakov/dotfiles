@@ -8,10 +8,62 @@ return {
 			"nvim-tree/nvim-web-devicons",
 		},
 		config = function()
-			vim.keymap.set("n", "\\", "<Cmd>Neotree toggle<CR>")
+			vim.keymap.set("n", "<leader>\\", "<Cmd>Neotree toggle<CR>")
+
+			vim.api.nvim_set_keymap("n", "<Tab>", "<C-w>w", { noremap = true, silent = true })
+			vim.api.nvim_set_keymap("n", "<S-Tab>", "<cmd>Neotree focus<CR>", { noremap = true, silent = true })
+
+			-- Add this to your neo-tree config function, after require("neo-tree").setup()
+
+			-- 1. First, prevent empty buffers from being created
 			require("neo-tree").setup({
-				close_if_last_window = false, -- Close Neo-tree if it is the last window left in the tab
-				popup_border_style = "NC", -- or "" to use 'winborder' on Neovim v0.11+
+				filesystem = {
+					hijack_netrw_behavior = "open_current", -- Prevents empty buffer creation
+					follow_current_file = {
+						enabled = true, -- Maintains better buffer focus
+						leave_dirs_open = false,
+					},
+				},
+				buffers = {
+					follow_current_file = {
+						enabled = true, -- Better buffer tracking
+						leave_dirs_open = false,
+					},
+				},
+			})
+
+			-- 2. Then, silently clean up any existing empty buffers
+			vim.api.nvim_create_autocmd({ "BufEnter", "VimEnter" }, {
+				desc = "Silently remove empty buffers",
+				callback = function()
+					vim.schedule(function()
+						local buf = vim.api.nvim_get_current_buf()
+						if vim.api.nvim_buf_is_valid(buf) then
+							local buf_name = vim.api.nvim_buf_get_name(buf)
+							local buf_ft = vim.bo[buf].filetype
+
+							-- More aggressive cleanup conditions
+							if
+								(buf_name == "" and vim.bo[buf].buftype == "")
+								or (buf_ft == "neo-tree" and buf_name:match("^$"))
+							then
+								pcall(function()
+									vim.cmd("silent! noautocmd keepalt bwipeout! " .. buf)
+								end)
+							end
+						end
+					end)
+				end,
+			})
+
+			-- 3. Finally, ensure no messages appear from buffer operations
+			vim.api.nvim_create_autocmd("CmdlineEnter", {
+				callback = function()
+					vim.opt.cmdheight = 1 -- Prevents message accumulation
+				end,
+			})
+			require("neo-tree").setup({
+				close_if_last_window = true, -- Close Neo-tree if it is the last window left in the tab
 				enable_git_status = true,
 				enable_diagnostics = true,
 				open_files_do_not_replace_types = { "terminal", "trouble", "qf" }, -- when opening files, do not use windows containing these filetypes or buftypes
@@ -235,7 +287,7 @@ return {
 					-- "open_current",  -- netrw disabled, opening a directory opens within the
 					-- window like netrw would, regardless of window.position
 					-- "disabled",    -- netrw left alone, neo-tree does not handle opening dirs
-					use_libuv_file_watcher = false, -- This will use the OS level file watchers to detect changes
+					use_libuv_file_watcher = true, -- This will use the OS level file watchers to detect changes
 					-- instead of relying on nvim autocmd events.
 					window = {
 						mappings = {

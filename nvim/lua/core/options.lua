@@ -1,5 +1,3 @@
-vim.opt.encoding = "UTF-8"
-vim.opt.spelllang = { "en_us", "de_de", "es_es" }
 vim.opt.hlsearch = false
 vim.opt.number = true
 vim.opt.mouse = "a"
@@ -9,7 +7,6 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.signcolumn = "yes"
 vim.opt.updatetime = 250
-vim.opt.timeoutlen = 300
 vim.opt.backup = false
 vim.opt.writebackup = false
 vim.opt.completeopt = { "menuone", "noselect" }

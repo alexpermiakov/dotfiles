@@ -16,7 +16,7 @@ return {
 	keys = {
 		-- Run LazyGit command and set background to transparent
 		{
-			"<leader>lg",
+			"<leader>g",
 			"<cmd>LazyGit<cr><cmd>hi LazyGitFloat guibg=NONE guifg=NONE<cr><cmd>setlocal winhl=NormalFloat:LazyGitFloat<cr>",
 			desc = "LazyGit",
 		},
